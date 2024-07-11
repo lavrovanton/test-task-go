@@ -1,0 +1,199 @@
+basePath: /
+definitions:
+  model.Service:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      paymentType:
+        type: string
+      price:
+        type: integer
+      type:
+        type: string
+    type: object
+  request.CreateService:
+    properties:
+      name:
+        maxLength: 255
+        type: string
+      paymentType:
+        maxLength: 255
+        type: string
+      price:
+        minimum: 0
+        type: integer
+      type:
+        maxLength: 255
+        type: string
+    required:
+    - name
+    - paymentType
+    - price
+    - type
+    type: object
+  request.PaginationService:
+    properties:
+      filter_field:
+        type: string
+      filter_value:
+        type: string
+      limit:
+        type: integer
+      page:
+        type: integer
+      rows:
+        items:
+          $ref: '#/definitions/model.Service'
+        type: array
+      sort_field:
+        type: string
+      sort_order:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: test-task-go
+paths:
+  /services:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: sort field
+        enum:
+        - id
+        - created_at
+        in: query
+        name: sort_field
+        type: string
+      - description: sort order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      - description: filter field
+        enum:
+        - type
+        in: query
+        name: filter_field
+        type: string
+      - description: ' filter value'
+        enum:
+        - VDS
+        - Dedicated_Server
+        - Hosting
+        in: query
+        name: filter_value
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/request.PaginationService'
+            type: array
+        "400":
+          description: '{ "message": "param is not valid" }'
+        "401":
+          description: '{ "message": "authorization failed" }'
+      summary: get services
+      tags:
+      - services
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: service creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateService'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: '{ message: "param is not valid" }'
+        "401":
+          description: '{ "message": "authorization failed" }'
+      summary: create service
+      tags:
+      - services
+  /services/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: '{ message: "param is not valid" }'
+        "401":
+          description: '{ "message": "authorization failed" }'
+        "404":
+          description: '{ "message": "resource not found" }'
+      summary: delete service by id
+      tags:
+      - services
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Service'
+            type: array
+        "400":
+          description: '{ "message": "param is not valid" }'
+        "401":
+          description: '{ "message": "authorization failed" }'
+        "404":
+          description: '{ "message": "resource not found" }'
+      summary: get service by id
+      tags:
+      - services
+security:
+- ApiKeyAuth: []
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-KEY
+    type: apiKey
+swagger: "2.0"
